@@ -1,0 +1,4 @@
+2021-06-10 15:47:28.263 +03:00 [INF] MSBuild registered from C:\Program Files\dotnet\sdk\5.0.204\
+2021-06-10 15:47:30.841 +03:00 [INF] Initializing upgrade step Select an entrypoint
+2021-06-10 15:47:30.845 +03:00 [INF] Setting entrypoint to only project in solution: C:\Users\Admin\source\repos\EmplCAM\EmplCRMClassLibrary\EmplCRMClassLibrary.csproj
+2021-06-10 15:47:31.066 +03:00 [INF] Initializing upgrade step Finalize upgrade
