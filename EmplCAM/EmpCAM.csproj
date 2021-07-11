@@ -224,6 +224,7 @@
     <Content Include="T13_form.xls">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="sassssssssssss.pfx" />
     <None Include="ThisAddIn.Designer.xml">
       <DependentUpon>ThisAddIn.cs</DependentUpon>
     </None>
@@ -281,10 +282,10 @@
     <StartupObject />
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>EmplCAM_TemporaryKey.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>sassssssssssss.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <!-- Include the build rules for a C# project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
