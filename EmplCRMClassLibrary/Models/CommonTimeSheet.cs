@@ -144,7 +144,8 @@ namespace EmplCRMClassLibrary.Models
                 templWorksheet.Cells[templRowPointer, 1] = emplCounter;
                 templWorksheet.Cells[templRowPointer, 2] = wrkTimeSheet.Employee.FullName;
                 templWorksheet.Cells[templRowPointer, 37] = wrkTimeSheet.WorkMonth.WorkedTime;
-
+                int workedDaysFirstHalfOfMonth = 0;
+                int workedDaysSecondHalfOfMonth = 0;
                 foreach (WorkDay wrDay in wrkTimeSheet.WorkMonth.WorkDays)
                 {
                     if (wrDay.Date.Day <= 15)
@@ -153,6 +154,10 @@ namespace EmplCRMClassLibrary.Models
                         if (wrDay.DayStatus == "З") templWorksheet.Cells[templRowPointer, 5 + wrDay.Date.Day].Interior.Color = Excel.XlRgbColor.rgbYellow;
                         templWorksheet.Cells[templRowPointer + 1, 5 + wrDay.Date.Day] = wrDay.WorkeTime.ToString("0.##");
                         if (wrDay.WorkeTime < 4 && wrDay.WorkeTime > 0) templWorksheet.Cells[templRowPointer + 1, 5 + wrDay.Date.Day].Interior.Color = Excel.XlRgbColor.rgbRed;
+
+                        if (wrDay.Date.DayOfWeek == DayOfWeek.Saturday || wrDay.Date.DayOfWeek == DayOfWeek.Sunday)
+                            templWorksheet.Cells[templRowPointer, 5 + wrDay.Date.Day].Interior.Color = Excel.XlRgbColor.rgbBlue;
+                        workedDaysFirstHalfOfMonth++;
                     }
                     else if (wrDay.Date.Day > 15)
                     {
@@ -160,9 +165,17 @@ namespace EmplCRMClassLibrary.Models
                         if (wrDay.DayStatus == "З") templWorksheet.Cells[templRowPointer, 5 + wrDay.Date.Day + 1].Interior.Color = Excel.XlRgbColor.rgbYellow;
                         templWorksheet.Cells[templRowPointer + 1, 5 + wrDay.Date.Day + 1] = wrDay.WorkeTime.ToString("0.##");
                         if (wrDay.WorkeTime < 4 && wrDay.WorkeTime > 0) templWorksheet.Cells[templRowPointer + 1, 5 + wrDay.Date.Day + 1].Interior.Color = Excel.XlRgbColor.rgbRed;
+
+                        if (wrDay.Date.DayOfWeek == DayOfWeek.Saturday || wrDay.Date.DayOfWeek == DayOfWeek.Sunday)
+                            templWorksheet.Cells[templRowPointer + 1, 5 + wrDay.Date.Day + 1].Interior.Color = Excel.XlRgbColor.rgbBlue;
+                        workedDaysSecondHalfOfMonth++;
                     }
+                    
 
                 }
+                if(workedDaysFirstHalfOfMonth != 0) templWorksheet.Cells[templRowPointer, 5 + 16] = workedDaysFirstHalfOfMonth;
+                templWorksheet.Cells[templRowPointer, 5 + 33] = workedDaysSecondHalfOfMonth+ workedDaysFirstHalfOfMonth;
+
                 templRowPointer += 2;
                 emplCounter++;
                 #region Вывод строки на рибоном
@@ -177,7 +190,7 @@ namespace EmplCRMClassLibrary.Models
             }
             #endregion
 
-           
+
         }
         public DateTime JoinDateToTime(DateTime date, DateTime time)
         {
