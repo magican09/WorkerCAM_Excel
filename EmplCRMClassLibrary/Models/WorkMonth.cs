@@ -71,11 +71,11 @@ namespace EmplCRMClassLibrary
                   lastWorkedDay = ParentTimeSheet.ParentCommonTimeSheet.LastDate;
              
            
-                  if (ParentTimeSheet.Employee.FullName == " Хаджиев Мурат Биоминович")
+                  if (ParentTimeSheet.Employee.FullName == "Байгубаков Динар Сулпанович")
                 ;
             if (ParentTimeSheet.Employee.FullName == "Сидоров Иван Владимирович")
                 ;
-            for (int ii = firstWorkedDay.Day; ii <= lastWorkedDay.Day-firstWorkedDay.Day; ii++)
+            for (int ii = 0; ii <= lastWorkedDay.Day-firstWorkedDay.Day; ii++)
             {
               
                 DateTime observeDay = firstWorkedDay.Add(new TimeSpan(ii, 0, 0, 0));
