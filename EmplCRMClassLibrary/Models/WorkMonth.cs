@@ -14,6 +14,10 @@ namespace EmplCRMClassLibrary
         public DateTime FirstDate { get; set; }
         public DateTime LastDate { get; set; }
         public int WorkedTime { get; set; }
+        public int WorkedDaysNamber { get; set; }
+        public int AbsentdDaysNamber { get; set; }
+        public int VacationdDaysNamber { get; set; }
+
         public IWorkerTimeSheet ParentTimeSheet { get; set; }
         public double WorkeTime
         {
@@ -26,8 +30,8 @@ namespace EmplCRMClassLibrary
             }
             set
             {
-                
-                    
+
+
             }
         }
         public WorkMonth()
@@ -41,24 +45,52 @@ namespace EmplCRMClassLibrary
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add: // если добавление
-                  //  SortDaysByDate();
+                                                        //  SortDaysByDate();
                     break;
                 case NotifyCollectionChangedAction.Remove: // если удаление
-                //    SortDaysByDate();
+                                                           //    SortDaysByDate();
                     break;
                 case NotifyCollectionChangedAction.Replace: // если замена
-                  //  SortDaysByDate();
+                                                            //  SortDaysByDate();
                     break;
             }
 
         }
-        
 
-        public  void  SortDaysByDate()
+
+        public void SortDaysByDate()
         {
-            WorkDays = new ObservableCollection<IWorkDay>(WorkDays.OrderBy(i => i.Date));
-          /*  foreach (WorkDay wrkDay in WorkDays)
-                wrkDay.AjustTimes();*/
+            WorkDays = new ObservableCollection<IWorkDay>(WorkDays.OrderBy(i => i.Date));//Соритируем текущий список дней..
+           
+            DateTime firstWorkedDay = WorkDays[0].Date;
+            DateTime lastWorkedDay =  WorkDays[WorkDays.Count -1].Date;
+              if (lastWorkedDay > ParentTimeSheet.ParentCommonTimeSheet.LastDate) ParentTimeSheet.ParentCommonTimeSheet.LastDate = lastWorkedDay;
+              if (ParentTimeSheet.ParentCommonTimeSheet.ScoreDate != DateTime.MinValue)
+                  lastWorkedDay = ParentTimeSheet.ParentCommonTimeSheet.ScoreDate;
+              else
+                  lastWorkedDay = ParentTimeSheet.ParentCommonTimeSheet.LastDate;
+             
+           
+                  if (ParentTimeSheet.Employee.FullName == " Хаджиев Мурат Биоминович")
+                ;
+            if (ParentTimeSheet.Employee.FullName == "Сидоров Иван Владимирович")
+                ;
+            for (int ii = firstWorkedDay.Day; ii <= lastWorkedDay.Day-firstWorkedDay.Day; ii++)
+            {
+              
+                DateTime observeDay = firstWorkedDay.Add(new TimeSpan(ii, 0, 0, 0));
+                var findedDay = WorkDays.FirstOrDefault(d => d.Date == observeDay);
+                if (findedDay == null) //Если в списке нед дня - добавляем его 
+                {
+                    WorkDay workDay = new WorkDay();
+                    workDay.Date = observeDay;
+                    workDay.ParentWorketMonth = this;
+                    workDay.CalcDayStatus();
+                    WorkDays.Add(workDay);
+                }
+            }
+            WorkDays = new ObservableCollection<IWorkDay>(WorkDays.OrderBy(i => i.Date));//Соритируем текущий список дней..
+
             FirstDate = WorkDays[0].Date;
             LastDate = WorkDays[WorkDays.Count - 1].Date;
             if (ParentTimeSheet != null)
@@ -66,28 +98,50 @@ namespace EmplCRMClassLibrary
                 ParentTimeSheet.FirstDate = FirstDate;
                 ParentTimeSheet.LastDate = LastDate;
             }
+            AbsentdDaysNamber = 0;
+            WorkedDaysNamber = 0;
+            foreach (WorkDay wrDay in WorkDays)
+            {
+                if (wrDay.IsAbsent == true)
+                    AbsentdDaysNamber++;
+
+                if (ParentTimeSheet.Employee.EmployeeContract.VacationDays.Contains(wrDay.Date.DayOfWeek))
+                    VacationdDaysNamber++;
+                     
+               if (wrDay.IsAbsent == false)
+                    WorkedDaysNamber++;
+            }
+            ParentTimeSheet.WorkedDaysNamber = WorkedDaysNamber;
+            ParentTimeSheet.AbsentdDaysNamber = AbsentdDaysNamber;
+            ParentTimeSheet.VacationdDaysNamber = VacationdDaysNamber;
+
         }
-        public void AddWorkDay (DateTime date, DateTime  inTime, DateTime  outTime)
+        public void AddWorkDay(DateTime date, DateTime inTime, DateTime outTime)
         {
-             WorkDay wrkday;
-              wrkday = FindWorkDayByDate(date);
-              if (wrkday == null)
-              {
-                  WorkDays.Add(new WorkDay(date, inTime, outTime));
-              }
-              else
-              {
-                  wrkday.InTime = inTime;
-                  wrkday.OutTime = outTime;
-              }
-         }
-        public WorkDay FindWorkDayByDate(DateTime  date)
+            WorkDay wrkday;
+            wrkday = FindWorkDayByDate(date);
+            if (wrkday == null)
+            {
+               
+                wrkday = new WorkDay(date, inTime, outTime, this);
+                WorkDays.Add(wrkday);
+                if (wrkday.Date > ParentTimeSheet.ParentCommonTimeSheet.LastDate)
+                    ParentTimeSheet.ParentCommonTimeSheet.LastDate = wrkday.Date;
+            }
+            else
+            {
+                wrkday.InTime = inTime;
+                wrkday.OutTime = outTime;
+            }
+           
+        }
+        public WorkDay FindWorkDayByDate(DateTime date)
         {
-            foreach (WorkDay wrkDay in WorkDays )
+            foreach (WorkDay wrkDay in WorkDays)
                 if (wrkDay.Date == date) return wrkDay;
             return null;
         }
 
-       
+
     }
 }

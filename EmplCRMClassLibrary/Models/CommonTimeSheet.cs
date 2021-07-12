@@ -12,7 +12,9 @@ namespace EmplCRMClassLibrary.Models
         const int EMPTY_ROW_BOUDARY = 20; //Количество пустых строк после который файл журнала Сигура считаем законченным
         const int JORNAL_FIRST_ROW = 9;// Первая строка в исходном файле журнала их Сигура
         const int TEMPLATE_FIRST_ROW = 13;//Первая строка в шаблоне Т13 
-        const int TEMPLATE_COLUMNS_NUMBER = 40;//Количество столбцов в табеле Т13. Если добавили стобцы в табель - увеличить ...
+        const int TEMPLATE_COLUMNS_NUMBER = 41;//Количество столбцов в табеле Т13. Если добавили стобцы в табель - увеличить ...
+        public DateTime  ScoreDate { get; set; }
+        public DateTime LastDate { get; set; }
         public CommonTimeSheet()
         {
             WorkerTimeSheets = new ObservableCollection<IWorkerTimeSheet>();
@@ -24,12 +26,16 @@ namespace EmplCRMClassLibrary.Models
             timeSheet = FindWorkerTimeSheetByFullName(fullName);//Поиск работника по полному имени.
             if (timeSheet == null)
             {
-                WorkerTimeSheets.Add(new WorkerTimeSheet(fullName));
+                EmployeeContract employeeContract = new EmployeeContract(); //Уставновили конкретные условия
+                employeeContract.VacationDays.Add(DayOfWeek.Sunday);        //Надо определять из файла в дальнейшем
+                employeeContract.WorkDayLength = 11;
+
+                WorkerTimeSheet newWorkerTimeSheet = new WorkerTimeSheet(fullName, employeeContract);
+                newWorkerTimeSheet.ParentCommonTimeSheet = this;
+                WorkerTimeSheets.Add(newWorkerTimeSheet);
                 timeSheet = (WorkerTimeSheet)WorkerTimeSheets[WorkerTimeSheets.Count - 1];
             }
             timeSheet.WorkMonth.AddWorkDay(date, inTime, outTime);
-
-
         }
         public WorkerTimeSheet FindWorkerTimeSheetByFullName(string fullName)
         {
@@ -44,16 +50,26 @@ namespace EmplCRMClassLibrary.Models
 
         }
         public void CreateTimeSheet(ref Excel.Worksheet templWorksheet, ref Excel.Worksheet jornalWorksheet,
+            DateTime scoreDate,
            Action<int, object> ReportProgress = null)
         {
-
+            ScoreDate = scoreDate;
             int emptyRowCounter = 0;
             int rowMaxCounter = 0;
             int jornalRowPointer = JORNAL_FIRST_ROW;
             int templRowPointer = TEMPLATE_FIRST_ROW;
             int lastRowNamber = jornalWorksheet.Cells.SpecialCells(Excel.XlCellType.xlCellTypeLastCell).Row;
             ProgressBarUserState currentProrgessBarParameters = new ProgressBarUserState();
+            int vacationDaysNumber = 0;
 
+          /*  for (int dayNamber = 0; dayNamber <= DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month); dayNamber++)
+            {
+                var dfd = DateTime.Now.Subtract(new TimeSpan(dayNamber, 0, 0, 0));
+                if (DateTime.Now.Subtract(new TimeSpan(dayNamber, 0, 0, 0)).DayOfWeek == DayOfWeek.Sunday)
+                    vacationDaysNumber++; //Вычитаем дни от сегодняшнего
+
+            }
+            */
             #region Примерный подсчет непустых строк в таблице
             while (emptyRowCounter < EMPTY_ROW_BOUDARY)
             {
@@ -77,6 +93,8 @@ namespace EmplCRMClassLibrary.Models
             jornalRowPointer = JORNAL_FIRST_ROW;
             emptyRowCounter = 0;
             CommonTimeSheet commonTimeSheet = this;
+          
+
             #region Обратока входного файла
             while (emptyRowCounter < EMPTY_ROW_BOUDARY)
             {
@@ -133,7 +151,10 @@ namespace EmplCRMClassLibrary.Models
             int emplCounter = 1;
             commonTimeSheet.SortTimeSheets();
             currentProrgessBarParameters.Max = commonTimeSheet.WorkerTimeSheets.Count;
-            foreach (WorkerTimeSheet wrkTimeSheet in commonTimeSheet.WorkerTimeSheets)
+           
+
+                //DateTime.DaysInMonth(DateTime.Now.Year,DateTime.Now.Month) 
+                foreach (WorkerTimeSheet wrkTimeSheet in commonTimeSheet.WorkerTimeSheets)
             {
                 #region Компирование строк в табеле для новой записи
                 templWorksheet.Range[templWorksheet.Cells[templRowPointer, 1],
@@ -155,9 +176,9 @@ namespace EmplCRMClassLibrary.Models
                         templWorksheet.Cells[templRowPointer + 1, 5 + wrDay.Date.Day] = wrDay.WorkeTime.ToString("0.##");
                         if (wrDay.WorkeTime < 4 && wrDay.WorkeTime > 0) templWorksheet.Cells[templRowPointer + 1, 5 + wrDay.Date.Day].Interior.Color = Excel.XlRgbColor.rgbRed;
 
-                        if (wrDay.Date.DayOfWeek == DayOfWeek.Saturday || wrDay.Date.DayOfWeek == DayOfWeek.Sunday)
+                        if (wrDay.DayStatus == "В")
                             templWorksheet.Cells[templRowPointer, 5 + wrDay.Date.Day].Interior.Color = Excel.XlRgbColor.rgbBlue;
-                        workedDaysFirstHalfOfMonth++;
+                        if(!wrDay.IsAbsent) workedDaysFirstHalfOfMonth++;
                     }
                     else if (wrDay.Date.Day > 15)
                     {
@@ -166,16 +187,18 @@ namespace EmplCRMClassLibrary.Models
                         templWorksheet.Cells[templRowPointer + 1, 5 + wrDay.Date.Day + 1] = wrDay.WorkeTime.ToString("0.##");
                         if (wrDay.WorkeTime < 4 && wrDay.WorkeTime > 0) templWorksheet.Cells[templRowPointer + 1, 5 + wrDay.Date.Day + 1].Interior.Color = Excel.XlRgbColor.rgbRed;
 
-                        if (wrDay.Date.DayOfWeek == DayOfWeek.Saturday || wrDay.Date.DayOfWeek == DayOfWeek.Sunday)
+                        if (wrDay.DayStatus=="В")
                             templWorksheet.Cells[templRowPointer + 1, 5 + wrDay.Date.Day + 1].Interior.Color = Excel.XlRgbColor.rgbBlue;
-                        workedDaysSecondHalfOfMonth++;
+                        if (!wrDay.IsAbsent) workedDaysSecondHalfOfMonth++;
                     }
                     
 
                 }
                 if(workedDaysFirstHalfOfMonth != 0) templWorksheet.Cells[templRowPointer, 5 + 16] = workedDaysFirstHalfOfMonth;
                 templWorksheet.Cells[templRowPointer, 5 + 33] = workedDaysSecondHalfOfMonth+ workedDaysFirstHalfOfMonth;
-
+                templWorksheet.Cells[templRowPointer, 5 + 34] = wrkTimeSheet.WorkedDaysNamber;
+                templWorksheet.Cells[templRowPointer, 5 + 35] = wrkTimeSheet.AbsentdDaysNamber;
+                templWorksheet.Cells[templRowPointer, 5 + 36] = wrkTimeSheet.VacationdDaysNamber;
                 templRowPointer += 2;
                 emplCounter++;
                 #region Вывод строки на рибоном

@@ -12,12 +12,15 @@ namespace EmplCRMClassLibrary.Models
             get { return _workMonth; }
             set { _workMonth = value; } 
         }
-         
+        public int WorkedDaysNamber { get; set; }
+        public int AbsentdDaysNamber { get; set; }
+        public int VacationdDaysNamber { get; set; }
         public DateTime FirstDate { get; set; }
         public DateTime LastDate { get; set; }
-        public WorkerTimeSheet(string fullName)
+        public ICommonTimeSheet  ParentCommonTimeSheet { get; set; }
+    public WorkerTimeSheet(string fullName, EmployeeContract employeeContract)
         {
-            Employee = new Employee(fullName);
+            Employee = new Employee(fullName, employeeContract);
             WorkMonth = new WorkMonth();
             WorkMonth.ParentTimeSheet = this;
         }

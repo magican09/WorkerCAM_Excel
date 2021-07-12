@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EmplCRMClassLibrary.Models;
+using System;
 
 namespace EmplCRMClassLibrary.Interfaces
 {
@@ -8,5 +9,9 @@ namespace EmplCRMClassLibrary.Interfaces
          IWorkMonth WorkMonth { get; set; }
          DateTime FirstDate { get; set; }
          DateTime LastDate { get; set; }
+         int WorkedDaysNamber { get; set; }
+         int AbsentdDaysNamber { get; set; }
+         int VacationdDaysNamber { get; set; }
+         ICommonTimeSheet ParentCommonTimeSheet { get; set; }
     }
 }

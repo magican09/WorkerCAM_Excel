@@ -22,7 +22,7 @@ namespace EmplCAM
         string safefilePath;
         string templPath;
         string templPathOut;
-
+        DateTime ScoreDate;
         private void MainRibbon_Load(object sender, RibbonUIEventArgs e)
         {
           //  var uri = new Uri("Maxls", UriKind.Relative);
@@ -64,14 +64,16 @@ namespace EmplCAM
             string workingDirectory = Environment.CurrentDirectory;
             string projectDirectory = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             Excel.Application xlApp = new Excel.Application();
-            xlApp.Visible = false;
+            xlApp.Visible = false ;
             Excel.Workbook templWB = xlApp.Workbooks.Open(templPath);
             Excel.Worksheet templWorksheet = templWB.Worksheets[1];
             Excel.Workbook jornalWB = xlApp.Workbooks.Open(filePath);
             Excel.Worksheet jornalWorksheet = jornalWB.Worksheets[1];
+             
 
             CommonTimeSheet _commonTimeSheet = new CommonTimeSheet();
-            _commonTimeSheet.CreateTimeSheet(ref templWorksheet, ref jornalWorksheet, ((BackgroundWorker)sender).ReportProgress);
+            _commonTimeSheet.CreateTimeSheet(ref templWorksheet, ref jornalWorksheet,ScoreDate,
+                ((BackgroundWorker)sender).ReportProgress);
 
             jornalWB.Close();
 
@@ -102,6 +104,8 @@ namespace EmplCAM
 
         private void buttonRun_Click(object sender, RibbonControlEventArgs e)
         {
+            if (checkBoxScoreDate.Checked) ScoreDate = DateTime.Now;
+            else ScoreDate = DateTime.MinValue;
             prForm = new FormProgressBar();
             commonProgressBar = (ProgressBar)prForm.Controls["progressBarCommon"];
             commonProgressBarLabel = (Label)prForm.Controls["labelCommon"];

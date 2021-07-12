@@ -9,6 +9,13 @@ namespace EmplCRMClassLibrary.Models
         public Employee(string fullName)
         {
             FullName = fullName;
+
         }
+        public Employee(string fullName, EmployeeContract employeeContract)
+        {
+            FullName = fullName;
+            EmployeeContract = employeeContract;
+        }
+        public IEmployeeContract EmployeeContract { get; set; } = new EmployeeContract();
     }
 }

@@ -209,6 +209,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="EmpCAM_TemporaryKey.pfx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -281,7 +282,7 @@
     <ManifestKeyFile>EmpCAM_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>2E6E558ED04608AC34B93575361C60CCE3AA1D0A</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>263EF9E1769A859A3F89DC6570337B86B652B1DC</ManifestCertificateThumbprint>
   </PropertyGroup>
   <!-- Include the build rules for a C# project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

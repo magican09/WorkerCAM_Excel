@@ -46,6 +46,7 @@ namespace EmplCAM
             this.buttonLoadTemplate = this.Factory.CreateRibbonButton();
             this.checkBox1 = this.Factory.CreateRibbonCheckBox();
             this.label1 = this.Factory.CreateRibbonLabel();
+            this.checkBoxScoreDate = this.Factory.CreateRibbonCheckBox();
             this.tab1.SuspendLayout();
             this.group1.SuspendLayout();
             this.SuspendLayout();
@@ -65,6 +66,7 @@ namespace EmplCAM
             this.group1.Items.Add(this.buttonLoadTemplate);
             this.group1.Items.Add(this.checkBox1);
             this.group1.Items.Add(this.label1);
+            this.group1.Items.Add(this.checkBoxScoreDate);
             this.group1.Label = "Табелирование";
             this.group1.Name = "group1";
             // 
@@ -107,6 +109,12 @@ namespace EmplCAM
             this.label1.Label = "label1dd";
             this.label1.Name = "label1";
             // 
+            // checkBoxScoreDate
+            // 
+            this.checkBoxScoreDate.Enabled = false;
+            this.checkBoxScoreDate.Label = "Выбрать текущую дату конечной";
+            this.checkBoxScoreDate.Name = "checkBoxScoreDate";
+            // 
             // MainRibbon
             // 
             this.Name = "MainRibbon";
@@ -131,6 +139,7 @@ namespace EmplCAM
         internal Microsoft.Office.Tools.Ribbon.RibbonCheckBox checkBox2;
         internal Microsoft.Office.Tools.Ribbon.RibbonLabel label1;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton buttonLoadTemplate;
+        internal Microsoft.Office.Tools.Ribbon.RibbonCheckBox checkBoxScoreDate;
     }
 
     partial class ThisRibbonCollection
