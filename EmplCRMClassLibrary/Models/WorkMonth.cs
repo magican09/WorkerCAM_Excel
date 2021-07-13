@@ -75,10 +75,10 @@ namespace EmplCRMClassLibrary
                 ;
             if (ParentTimeSheet.Employee.FullName == "Сидоров Иван Владимирович")
                 ;
-            for (int ii = 0; ii <= lastWorkedDay.Day-firstWorkedDay.Day; ii++)
+            for (int ii = 0; ii < lastWorkedDay.Day-firstWorkedDay.Day; ii++)
             {
               
-                DateTime observeDay = firstWorkedDay.Add(new TimeSpan(ii, 0, 0, 0));
+                DateTime observeDay = firstWorkedDay.Add(new TimeSpan(ii+1, 0, 0, 0));
                 var findedDay = WorkDays.FirstOrDefault(d => d.Date == observeDay);
                 if (findedDay == null) //Если в списке нед дня - добавляем его 
                 {

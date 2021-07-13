@@ -12,7 +12,7 @@ namespace EmplCRMClassLibrary.Models
         const int EMPTY_ROW_BOUDARY = 20; //Количество пустых строк после который файл журнала Сигура считаем законченным
         const int JORNAL_FIRST_ROW = 9;// Первая строка в исходном файле журнала их Сигура
         const int TEMPLATE_FIRST_ROW = 13;//Первая строка в шаблоне Т13 
-        const int TEMPLATE_COLUMNS_NUMBER = 41;//Количество столбцов в табеле Т13. Если добавили стобцы в табель - увеличить ...
+        const int TEMPLATE_COLUMNS_NUMBER = 43;//Количество столбцов в табеле Т13. Если добавили стобцы в табель - увеличить ...
         public DateTime  ScoreDate { get; set; }
         public DateTime LastDate { get; set; }
         public CommonTimeSheet()
@@ -199,6 +199,9 @@ namespace EmplCRMClassLibrary.Models
                 templWorksheet.Cells[templRowPointer, 5 + 34] = wrkTimeSheet.WorkedDaysNamber;
                 templWorksheet.Cells[templRowPointer, 5 + 35] = wrkTimeSheet.AbsentdDaysNamber;
                 templWorksheet.Cells[templRowPointer, 5 + 36] = wrkTimeSheet.VacationdDaysNamber;
+                if ((wrkTimeSheet.AbsentdDaysNamber - wrkTimeSheet.VacationdDaysNamber) >= 0)
+                    templWorksheet.Cells[templRowPointer, 5 + 37] = wrkTimeSheet.AbsentdDaysNamber - wrkTimeSheet.VacationdDaysNamber;
+
                 templRowPointer += 2;
                 emplCounter++;
                 #region Вывод строки на рибоном
