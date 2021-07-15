@@ -209,6 +209,7 @@ namespace EmplCAM
                   .Where(sr => sr.ResultStatus == ResultStatus.AgreedWithComments).Count();
                 if(agreedNumber>0)
                 {
+
                     securityServiceReportWorksheet.Cells[outputRowPointer, 1] = outputRowPointer-1;
                     securityServiceReportWorksheet.Cells[outputRowPointer , 2] = empl.FullName;
                     securityServiceReportWorksheet.Cells[outputRowPointer , 3] = "Согласовано";
