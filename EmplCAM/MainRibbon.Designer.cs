@@ -47,14 +47,19 @@ namespace EmplCAM
             this.checkBox1 = this.Factory.CreateRibbonCheckBox();
             this.label1 = this.Factory.CreateRibbonLabel();
             this.checkBoxScoreDate = this.Factory.CreateRibbonCheckBox();
+            this.group2 = this.Factory.CreateRibbonGroup();
+            this.buttonOpenSBFile = this.Factory.CreateRibbonButton();
+            this.buttonCreateReportSB = this.Factory.CreateRibbonButton();
             this.tab1.SuspendLayout();
             this.group1.SuspendLayout();
+            this.group2.SuspendLayout();
             this.SuspendLayout();
             // 
             // tab1
             // 
             this.tab1.ControlId.ControlIdType = Microsoft.Office.Tools.Ribbon.RibbonControlIdType.Office;
             this.tab1.Groups.Add(this.group1);
+            this.tab1.Groups.Add(this.group2);
             this.tab1.Label = "WorkerCAM";
             this.tab1.Name = "tab1";
             // 
@@ -115,6 +120,26 @@ namespace EmplCAM
             this.checkBoxScoreDate.Label = "Выбрать текущую дату конечной";
             this.checkBoxScoreDate.Name = "checkBoxScoreDate";
             // 
+            // group2
+            // 
+            this.group2.Items.Add(this.buttonOpenSBFile);
+            this.group2.Items.Add(this.buttonCreateReportSB);
+            this.group2.Label = "Отчеты";
+            this.group2.Name = "group2";
+            // 
+            // buttonOpenSBFile
+            // 
+            this.buttonOpenSBFile.Label = "Выбрать проверки СБ за день";
+            this.buttonOpenSBFile.Name = "buttonOpenSBFile";
+            this.buttonOpenSBFile.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.buttonOpenSBFile_Click);
+            // 
+            // buttonCreateReportSB
+            // 
+            this.buttonCreateReportSB.Enabled = false;
+            this.buttonCreateReportSB.Label = "Сформироваться отчет СБ за день";
+            this.buttonCreateReportSB.Name = "buttonCreateReportSB";
+            this.buttonCreateReportSB.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.buttonCreateReportSB_Click);
+            // 
             // MainRibbon
             // 
             this.Name = "MainRibbon";
@@ -125,6 +150,8 @@ namespace EmplCAM
             this.tab1.PerformLayout();
             this.group1.ResumeLayout(false);
             this.group1.PerformLayout();
+            this.group2.ResumeLayout(false);
+            this.group2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -140,6 +167,9 @@ namespace EmplCAM
         internal Microsoft.Office.Tools.Ribbon.RibbonLabel label1;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton buttonLoadTemplate;
         internal Microsoft.Office.Tools.Ribbon.RibbonCheckBox checkBoxScoreDate;
+        internal Microsoft.Office.Tools.Ribbon.RibbonGroup group2;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton buttonOpenSBFile;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton buttonCreateReportSB;
     }
 
     partial class ThisRibbonCollection

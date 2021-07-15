@@ -3,11 +3,13 @@ using System;
 using System.Windows.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
 using EmplCRMClassLibrary.Models;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Threading;
 using System.IO;
 using System.Reflection;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace EmplCAM
 {
@@ -25,7 +27,7 @@ namespace EmplCAM
         DateTime ScoreDate;
         private void MainRibbon_Load(object sender, RibbonUIEventArgs e)
         {
-          //  var uri = new Uri("Maxls", UriKind.Relative);
+            //  var uri = new Uri("Maxls", UriKind.Relative);
             bw = new BackgroundWorker();
             bw.WorkerReportsProgress = true;
             bw.WorkerSupportsCancellation = true;
@@ -64,20 +66,20 @@ namespace EmplCAM
             string workingDirectory = Environment.CurrentDirectory;
             string projectDirectory = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             Excel.Application xlApp = new Excel.Application();
-            xlApp.Visible = false ;
+            xlApp.Visible = false;
             Excel.Workbook templWB = xlApp.Workbooks.Open(templPath);
             Excel.Worksheet templWorksheet = templWB.Worksheets[1];
             Excel.Workbook jornalWB = xlApp.Workbooks.Open(filePath);
             Excel.Worksheet jornalWorksheet = jornalWB.Worksheets[1];
-             
+
 
             CommonTimeSheet _commonTimeSheet = new CommonTimeSheet();
-            _commonTimeSheet.CreateTimeSheet(ref templWorksheet, ref jornalWorksheet,ScoreDate,
+            _commonTimeSheet.CreateTimeSheet(ref templWorksheet, ref jornalWorksheet, ScoreDate,
                 ((BackgroundWorker)sender).ReportProgress);
 
             jornalWB.Close();
 
-                templPathOut = filePath.Substring(0, filePath.LastIndexOf(@"\") + 1) + "T13  " + DateTime.Now.ToShortDateString() + ".xls";
+            templPathOut = filePath.Substring(0, filePath.LastIndexOf(@"\") + 1) + "T13  " + DateTime.Now.ToShortDateString() + ".xls";
             templWB.SaveAs(templPathOut);
             if (!checkBox1.Checked && !checkBox1.Checked || checkBox1.Checked)
 
@@ -131,6 +133,101 @@ namespace EmplCAM
                 }
 
             }
+        }
+
+        private void buttonOpenSBFile_Click(object sender, RibbonControlEventArgs e)
+        {
+
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.InitialDirectory = "c:\\";
+                openFileDialog.Filter = "txt files (*.xls)|*.xlsm|All files (*.*)|*.*";
+                openFileDialog.FilterIndex = 2;
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    templPath = openFileDialog.FileName;
+                    buttonCreateReportSB.Enabled = true;
+
+                }
+
+            }
+
+
+
+
+        }
+
+        private void buttonCreateReportSB_Click(object sender, RibbonControlEventArgs e)
+        {
+            string workingDirectory = Environment.CurrentDirectory;
+            string projectDirectory = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            Excel.Application xlApp = new Excel.Application();
+            xlApp.Visible = true;
+            Excel.Workbook securityServiceRecordFileWB = xlApp.Workbooks.Open(templPath);
+            Excel.Worksheet securityServiceFileWorksheet = securityServiceRecordFileWB.Worksheets["TDSheet"];
+            const int EMPTY_ROW_BOUDARY = 20;
+            const int FIRST_ROW_POINTER = 7;
+            int emptyRowCounter = 0;
+            int sbFileRowPointer = 0;
+            int rowMaxCounter = 0;
+            int rowPointer = 0;
+            SecurityServiceRecordJournal securityServiceRecordJournal  = new SecurityServiceRecordJournal();
+
+            while (securityServiceFileWorksheet.Cells[FIRST_ROW_POINTER + sbFileRowPointer, 1].Value != null)
+            {
+                ResultStatus resultStatus = ResultStatus.Unsettled;
+                string employeeFullName = securityServiceFileWorksheet.Cells[FIRST_ROW_POINTER + sbFileRowPointer, 2].Value;
+                string strResultStatus = securityServiceFileWorksheet.Cells[FIRST_ROW_POINTER + sbFileRowPointer, 10].Value;
+
+                if (strResultStatus.Contains("Согласовано") && !strResultStatus.Contains("Согласовано с замечаниями"))
+                    resultStatus = ResultStatus.Agreed;
+                if (strResultStatus.Contains("Согласовано с замечаниями"))
+                    resultStatus = ResultStatus.AgreedWithComments;
+                securityServiceRecordJournal.SecurityServiceRecords.Add(new SecurityServiceRecord(employeeFullName, resultStatus));
+                sbFileRowPointer++;
+            }
+
+            securityServiceRecordFileWB.Worksheets.Add();
+
+            Excel.Worksheet securityServiceReportWorksheet = securityServiceRecordFileWB.Worksheets[1];
+            securityServiceReportWorksheet.Name = "Отчет";
+            int outputRowPointer = 1;
+            securityServiceReportWorksheet.Cells[outputRowPointer, 1] = "№ п/п";
+            securityServiceReportWorksheet.Cells[outputRowPointer, 2] = "Документ.Ответственный";
+            securityServiceReportWorksheet.Cells[outputRowPointer, 3] = "Результат согласования";
+            securityServiceReportWorksheet.Cells[outputRowPointer, 4] = "Количество";
+            outputRowPointer++;
+            foreach (Employee empl in securityServiceRecordJournal.Employees)
+            {
+                int agreedNumber = securityServiceRecordJournal.SecurityServiceRecords
+                  .Where(em => em.FullName == empl.FullName)
+                  .Where(sr => sr.ResultStatus == ResultStatus.Agreed).Count();
+                int agreedWithCommentsNumber = securityServiceRecordJournal.SecurityServiceRecords
+                  .Where(em => em.FullName == empl.FullName)
+                  .Where(sr => sr.ResultStatus == ResultStatus.AgreedWithComments).Count();
+                if(agreedNumber>0)
+                {
+                    securityServiceReportWorksheet.Cells[outputRowPointer, 1] = outputRowPointer-1;
+                    securityServiceReportWorksheet.Cells[outputRowPointer , 2] = empl.FullName;
+                    securityServiceReportWorksheet.Cells[outputRowPointer , 3] = "Согласовано";
+                    securityServiceReportWorksheet.Cells[outputRowPointer , 4] = agreedNumber;
+
+                    outputRowPointer++;
+                }
+                if (agreedWithCommentsNumber > 0)
+                {
+                    securityServiceReportWorksheet.Cells[outputRowPointer, 1] = outputRowPointer-1;
+                    securityServiceReportWorksheet.Cells[outputRowPointer , 2] = empl.FullName;
+                    securityServiceReportWorksheet.Cells[outputRowPointer , 3] = "Согласовано с замечаниями";
+                    securityServiceReportWorksheet.Cells[outputRowPointer , 4] = agreedWithCommentsNumber;
+                    outputRowPointer++;
+                }
+
+            }
+            string savePath = templPath.Replace(".xlsx", "") + " " + DateTime.Now.ToString("D") + ".xlsx";
+            securityServiceRecordFileWB.SaveAs(savePath);
         }
     }
 }
