@@ -198,7 +198,11 @@ namespace EmplCAM
             securityServiceReportWorksheet.Cells[outputRowPointer, 2] = "Документ.Ответственный";
             securityServiceReportWorksheet.Cells[outputRowPointer, 3] = "Результат согласования";
             securityServiceReportWorksheet.Cells[outputRowPointer, 4] = "Количество";
+            (securityServiceReportWorksheet.Rows[1] as Excel.Range).Font.Bold = true;
             outputRowPointer++;
+            int AgreedSumm = 0;
+            int agreedWithCommentsSumm = 0;
+
             foreach (Employee empl in securityServiceRecordJournal.Employees)
             {
                 int agreedNumber = securityServiceRecordJournal.SecurityServiceRecords
@@ -214,7 +218,7 @@ namespace EmplCAM
                     securityServiceReportWorksheet.Cells[outputRowPointer , 2] = empl.FullName;
                     securityServiceReportWorksheet.Cells[outputRowPointer , 3] = "Согласовано";
                     securityServiceReportWorksheet.Cells[outputRowPointer , 4] = agreedNumber;
-
+                    AgreedSumm+= agreedNumber;
                     outputRowPointer++;
                 }
                 if (agreedWithCommentsNumber > 0)
@@ -223,10 +227,28 @@ namespace EmplCAM
                     securityServiceReportWorksheet.Cells[outputRowPointer , 2] = empl.FullName;
                     securityServiceReportWorksheet.Cells[outputRowPointer , 3] = "Согласовано с замечаниями";
                     securityServiceReportWorksheet.Cells[outputRowPointer , 4] = agreedWithCommentsNumber;
+                    agreedWithCommentsSumm+= agreedWithCommentsNumber;
                     outputRowPointer++;
                 }
 
             }
+            securityServiceReportWorksheet.Columns[1].ColumnWidth = 10;
+            securityServiceReportWorksheet.Columns[2].ColumnWidth = 50;
+            securityServiceReportWorksheet.Columns[3].ColumnWidth = 30;
+            securityServiceReportWorksheet.Columns[4].ColumnWidth = 10;
+
+            securityServiceReportWorksheet.Cells[outputRowPointer, 2] = "Согласовано";
+            (securityServiceReportWorksheet.Cells[outputRowPointer, 2] as Excel.Range).Font.Bold = true;
+
+            securityServiceReportWorksheet.Cells[outputRowPointer, 4] = AgreedSumm;
+            (securityServiceReportWorksheet.Cells[outputRowPointer, 4] as Excel.Range).Font.Bold = true;
+            outputRowPointer++;
+            securityServiceReportWorksheet.Cells[outputRowPointer, 2] = "Согласовано с замечаниями";
+            (securityServiceReportWorksheet.Cells[outputRowPointer, 2] as Excel.Range).Font.Bold = true;
+            securityServiceReportWorksheet.Cells[outputRowPointer, 4] = agreedWithCommentsSumm;
+            (securityServiceReportWorksheet.Cells[outputRowPointer, 4] as Excel.Range).Font.Bold = true;
+
+
             string savePath = templPath.Replace(".xlsx", "") + " " + DateTime.Now.ToString("D") + ".xlsx";
             securityServiceRecordFileWB.SaveAs(savePath);
         }
